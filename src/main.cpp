@@ -9,7 +9,7 @@
 #define DMX_CHANNELS 512
 #define VERSION __DATE__ " / " __TIME__
 
-const uint8_t I2S_PIN = 21;
+const uint8_t I2S_PIN = 13;
 const char* DEVICE_NAME = "IllumiNaughty";
 const uint16_t ARTNET_UNIVERSE = 1;
 
