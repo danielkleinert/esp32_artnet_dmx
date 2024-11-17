@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <WiFiManager.h>
 #include <ESPmDNS.h>
+#include "osc_handler.h"
 
 #include "i2s_dmx.h"
 #include "artnet_handler.h"
@@ -12,6 +13,7 @@
 const uint8_t I2S_PIN = 13;
 const char* DEVICE_NAME = "IllumiNaughty";
 const uint16_t ARTNET_UNIVERSE = 1;
+const uint16_t OSC_PORT = 8081; 
 
 uint8_t dmxValues[DMX_CHANNELS] = {0};
 
@@ -37,6 +39,7 @@ void setup() {
 
   dmx.begin();
   ArtnetHandler::init(onDmxValue, ARTNET_UNIVERSE);
+  OscHandler::init(onDmxValue, OSC_PORT);
   
   WebUI::init(String(DEVICE_NAME));
   WebUI::onSliderChange(dmxValues);
@@ -45,12 +48,15 @@ void setup() {
 
 void loop() {
   ArtnetHandler::read();
+  OscHandler::read();
   dmx.update(dmxValues);
 
   static unsigned long lastStatusUpdate = 0;
   if (millis() - lastStatusUpdate > 500) {
       String status = "Art-Net FPS: " + String(ArtnetHandler::getFPS(), 1) + 
-                      "\nDMX FPS: " + String(dmx.getFPS(), 1);
+                      "\nDMX FPS: " + String(dmx.getFPS(), 1) +
+                      "\nOSC Last: " + (OscHandler::getTimeSinceLastMessage() == 0 ? "Never" : 
+                          String(OscHandler::getTimeSinceLastMessage() / 1000.0, 1) + "s");
       
       Serial.println(status);
       WebUI::updateStatus(status);

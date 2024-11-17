@@ -1,5 +1,6 @@
 #include "web_ui.h"
 #include "artnet_handler.h"
+#include "osc_handler.h"
 
 constexpr uint8_t DISPLAY_SLIDERS = 32;
 
@@ -15,6 +16,7 @@ void WebUI::init(const String& deviceName) {
     
     statusId = ESPUI.addControl(Label, "Status", "", ControlColor::Turquoise);
     ESPUI.switcher("Art-Net", &WebUI::pauseArtnetCallback, ControlColor::Carrot, true);
+    ESPUI.switcher("OSC", &WebUI::pauseOscCallback, ControlColor::Carrot, true);
 
     String labelStyle = "background-color: unset; margin-bottom: unset; top: .15em;";
     uint16_t dmxChanelPanel = ESPUI.addControl(Label, "", "");
@@ -41,6 +43,10 @@ void WebUI::updateChannelValue(int channel, uint8_t value) {
 
 void WebUI::pauseArtnetCallback(Control* sender, int value) {
     ArtnetHandler::setPaused(value == S_INACTIVE);
+}
+
+void WebUI::pauseOscCallback(Control* sender, int value) {
+    OscHandler::setPaused(value == S_INACTIVE);
 }
 
 void WebUI::updateStatus(const String& status) {
